@@ -9,21 +9,9 @@
 <meta name="theme-color" content="#4CAF50">
 
 <style>
-  @font-face {
-    font-family: 'Inter';
-    src: url('fonts/Inter-Regular.woff2') format('woff2');
-    font-weight: 400;
-  }
-  @font-face {
-    font-family: 'Inter';
-    src: url('fonts/Inter-Medium.woff2') format('woff2');
-    font-weight: 500;
-  }
-  @font-face {
-    font-family: 'Inter';
-    src: url('fonts/Inter-SemiBold.woff2') format('woff2');
-    font-weight: 600;
-  }
+  @font-face { font-family: 'Inter'; src: url('fonts/Inter-Regular.woff2') format('woff2'); font-weight: 400;}
+  @font-face { font-family: 'Inter'; src: url('fonts/Inter-Medium.woff2') format('woff2'); font-weight: 500;}
+  @font-face { font-family: 'Inter'; src: url('fonts/Inter-SemiBold.woff2') format('woff2'); font-weight: 600;}
 
   *{box-sizing:border-box}
   body{
@@ -37,7 +25,7 @@
   header{
     background:#fff;
     padding:12px;
-    border-bottom:1px solid #ddd
+    border-bottom:1px solid #ddd;
   }
   .top{
     display:flex;
@@ -55,7 +43,7 @@
     margin-left:auto;
     font-size:16px;
     cursor:pointer;
-    font-weight:600
+    font-weight:600;
   }
   h1{
     margin:0 0 10px 0;
@@ -67,7 +55,7 @@
     font-size:16px;
     border:none;
     border-radius:10px;
-    background:#e5e5ea
+    background:#e5e5ea;
   }
 
   /* Botones de exportar/importar pequeños */
@@ -102,7 +90,7 @@
     padding: 16px;
     z-index: 20;
   }
-  #drawer.open { transform: translateX(0); }
+  #drawer.open { transform: translateX(0);}
   #drawer button {
     width: 100%;
     padding: 13px;
@@ -114,14 +102,11 @@
     font-size: 14px;
     text-align: left;
   }
-  #drawer button.active { background: #000; color: #fff; }
-  #drawer button:hover { background: #333; color: #fff; }
+  #drawer button.active { background: #000; color: #fff;}
+  #drawer button:hover { background: #333; color: #fff;}
 
   /* ===== LISTA ===== */
-  main{
-    padding:12px;
-    padding-bottom:260px
-  }
+  main{ padding:12px; padding-bottom:12px;}
   .item{
     background:#fff;
     border-radius:12px;
@@ -129,14 +114,14 @@
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:8px
+    margin-bottom:8px;
   }
   .item small{
     display:block;
     color:#666;
-    font-size:12px
+    font-size:12px;
   }
-  .item > div{ display:flex }
+  .item > div{ display:flex;}
   .item button{
     width:36px;
     height:36px;
@@ -146,48 +131,10 @@
     font-weight:600;
     display:flex;
     align-items:center;
-    justify-content:center
+    justify-content:center;
   }
-  .add{ background:#000; color:#fff }
-  .del{ background:#ff3b30; color:#fff }
-
-  /* ===== TICKET ===== */
-  #ticket-panel {
-    position: fixed;
-    bottom: 20px;
-    left: 12px;
-    right: 12px;
-    background: #fff;
-    border-radius: 14px;
-    padding: 16px 12px 24px 12px;
-  }
-  #ticket-panel strong {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 18px;
-  }
-  #ticket-panel ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  #ticket-panel li {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-  .ticket-actions{
-    display:flex;
-    gap:8px;
-    margin-top:8px
-  }
-  .ticket-actions button{
-    flex:1;
-    border:none;
-    border-radius:10px;
-    padding:12px;
-    font-weight:600
-  }
+  .add{ background:#000; color:#fff;}
+  .del{ background:#ff3b30; color:#fff;}
 
   /* ===== MODALES ===== */
   .modal{
@@ -197,90 +144,47 @@
     display:none;
     align-items:center;
     justify-content:center;
-    z-index:30
+    z-index:50;
   }
   .modal .box{
     background:#fff;
     border-radius:16px;
     padding:20px;
     width:90%;
-    max-width:360px
+    max-width:400px;
+    max-height:80vh;
+    overflow-y:auto;
   }
-  .modal input,
-  .modal select{
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+  .modal input, .modal select{
+    width:100%;
+    padding:12px;
+    margin-bottom:12px;
+    font-size:16px;
+    border-radius:10px;
+    border:1px solid #ccc;
   }
-  .modal h3{
-    font-size: 16px;
-    margin:0 0 12px;
-    text-align:center
-  }
-  .modal p{
-    font-size: 16px;
-    margin:14px 0 6px;
-    font-weight:600
-  }
-  .btns.qty{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:8px
-  }
-  .btns.unit{
-    display:flex;
-    gap:8px
-  }
+  .modal h3{ font-size:16px; margin:0 0 12px; text-align:center;}
+  .modal p{ font-size:16px; margin:14px 0 6px; font-weight:600;}
+  .btns.qty{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px;}
+  .btns.unit{ display:flex; gap:8px;}
   .btns button{
-    font-size: 16px;
+    font-size:16px;
     padding:10px 0;
     border:1px solid #000;
     border-radius:12px;
     background:#fff;
-    font-weight:600
+    font-weight:600;
   }
-  .btns button.active{ background:#000; color:#fff }
-  .modal .box > div:last-child{
-    display:flex;
-    gap:8px;
-    margin-top:16px
-  }
-  .modal #add,
-  .modal #save,
-  .modal #send{ background:#43a047; color:#fff }
-  .modal #cancel{ background:#ff3b30; color:#fff }
-  .modal button{
-    flex:1;
-    padding:12px;
-    border:none;
-    border-radius:12px;
-    font-weight:600
-  }
-
-  /* ===== TICKET IMPRESIÓN ===== */
-  #print-ticket{ display:none; font-family:monospace }
-  @media print{
-    body *{display:none!important}
-    #print-ticket,
-    #print-ticket *{display:block!important}
-    #print-ticket{ width:80mm; font-size:18px }
-    .ticket-line{ display:flex; justify-content:space-between }
-    .gracias{ text-align:center; margin-top:20px }
-  }
+  .btns button.active{ background:#000; color:#fff;}
+  .modal .box > div:last-child{ display:flex; gap:8px; margin-top:16px;}
+  .modal #add,.modal #save,.modal #send{ background:#43a047; color:#fff;}
+  .modal #cancel{ background:#ff3b30; color:#fff;}
+  .modal button{ flex:1; padding:12px; border:none; border-radius:12px; font-weight:600;}
 
   /* ===== NORMALIZAR BOTONES (Safari iOS) ===== */
-  button{
-    appearance:none;
-    -webkit-appearance:none;
-    background-color:#fff;
-    color:#000;
-  }
+  button{ appearance:none; -webkit-appearance:none; background-color:#fff; color:#000;}
 </style>
 </head>
-
 <body>
 
 <div id="drawer"></div>
@@ -291,7 +195,7 @@
     <h1>Despensa</h1>
     <div class="addMain" id="editBtn" onclick="toggleEditMode()">✏️ Editar</div>
 
-    <!-- Contenedor de botones que solo se muestran en modo edición -->
+    <!-- Botones de edición -->
     <div id="editButtons" style="display:none; gap:8px; align-items:center; margin-left:auto;">
       <button onclick="exportData()" class="smallBtn">💾 Exportar</button>
       <button onclick="document.getElementById('importFile').click()" class="smallBtn">📂 Importar</button>
@@ -307,13 +211,20 @@
 
 <main id="list"></main>
 
-<div id="ticket-panel">
-  <strong>🧾 Ticket</strong>
-  <ul id="ticketList"></ul>
-  <div class="ticket-actions">
-    <button onclick="printTicket()">🖨️ Imprimir</button>
-    <button onclick="sendWhatsApp()">📲 WhatsApp</button>
-    <button onclick="askResetTicket()">🔄 Nuevo</button>
+<!-- BOTÓN PARA ABRIR TICKET -->
+<button id="viewTicketBtn" onclick="openTicketModal()" style="position:fixed; bottom:20px; right:20px; padding:12px 16px; border-radius:12px; background:#43a047; color:#fff; font-weight:600; z-index:50;">🧾 Ver Ticket</button>
+
+<!-- MODAL TICKET -->
+<div id="ticketModal" class="modal">
+  <div class="box">
+    <strong>🧾 Ticket</strong>
+    <div id="ticketSummary" style="margin-bottom:12px; font-weight:600;"></div>
+    <ul id="ticketList"></ul>
+    <div class="ticket-actions" style="margin-top:12px;">
+      <button onclick="printTicket()">🖨️ Imprimir</button>
+      <button onclick="sendWhatsApp()">📲 WhatsApp</button>
+      <button onclick="closeTicketModal()">❌ Cerrar</button>
+    </div>
   </div>
 </div>
 
@@ -327,16 +238,26 @@
   </div>
 </div>
 
-<div id="print-ticket">
-  <h2>🧾 PEDIDO</h2>
-  <p>Fecha: <span id="ticket-fecha"></span></p>
-  <hr>
-  <div id="ticket-items"></div>
-  <hr>
-  <p>Total productos: <span id="ticket-total"></span></p>
-  <p class="gracias">Gracias por su pedido</p>
-</div>
-
 <script src="app.js"></script>
+<script>
+  // Mostrar/Ocultar botones de edición
+  const editButtons = document.getElementById("editButtons");
+  let editMode = false;
+  function toggleEditMode(){
+    editMode = !editMode;
+    editButtons.style.display = editMode ? "flex" : "none";
+    render();
+    document.getElementById("editBtn").textContent = editMode ? "↩️ Volver" : "✏️ Editar";
+  }
+
+  // Abrir/Cerrar modal ticket
+  function openTicketModal(){
+    document.getElementById("ticketModal").style.display = "flex";
+    renderTicket();
+  }
+  function closeTicketModal(){
+    document.getElementById("ticketModal").style.display = "none";
+  }
+</script>
 </body>
 </html>
