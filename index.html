@@ -155,7 +155,7 @@
     max-height:80vh;
     overflow-y:auto;
   }
-  .modal input, .modal select{
+  .modal input, .modal select, .modal textarea{
     width:100%;
     padding:12px;
     margin-bottom:12px;
@@ -181,8 +181,23 @@
   .modal #cancel{ background:#ff3b30; color:#fff;}
   .modal button{ flex:1; padding:12px; border:none; border-radius:12px; font-weight:600;}
 
+  /* ===== BOTÓN VER TICKET ===== */
+  #viewTicketBtn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    padding:12px 16px;
+    border-radius:12px;
+    background:#000; /* fondo negro */
+    color:#fff;
+    font-weight:600;
+    z-index:50;
+    border:none;
+    cursor:pointer;
+  }
+
   /* ===== NORMALIZAR BOTONES (Safari iOS) ===== */
-  button{ appearance:none; -webkit-appearance:none; background-color:#fff; color:#000;}
+  button{ appearance:none; -webkit-appearance:none;}
 </style>
 </head>
 <body>
@@ -211,8 +226,8 @@
 
 <main id="list"></main>
 
-<!-- BOTÓN PARA ABRIR TICKET -->
-<button id="viewTicketBtn" onclick="openTicketModal()" style="position:fixed; bottom:20px; right:20px; padding:12px 16px; border-radius:12px; background:#43a047; color:#fff; font-weight:600; z-index:50;">🧾 Ver Ticket</button>
+<!-- BOTÓN VER TICKET -->
+<button id="viewTicketBtn" onclick="openTicketModal()">🧾 Ver Ticket</button>
 
 <!-- MODAL TICKET -->
 <div id="ticketModal" class="modal">
@@ -220,7 +235,7 @@
     <strong>🧾 Ticket</strong>
     <div id="ticketSummary" style="margin-bottom:12px; font-weight:600;"></div>
     <ul id="ticketList"></ul>
-    <div class="ticket-actions" style="margin-top:12px;">
+    <div class="ticket-actions" style="margin-top:12px; display:flex; gap:8px;">
       <button onclick="printTicket()">🖨️ Imprimir</button>
       <button onclick="sendWhatsApp()">📲 WhatsApp</button>
       <button onclick="closeTicketModal()">❌ Cerrar</button>
