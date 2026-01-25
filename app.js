@@ -8,13 +8,14 @@ const confirmText   = document.getElementById("confirmText");
 const addItemBtn    = document.getElementById("addItemBtn");
 const editBtn       = document.getElementById("editBtn");
 const editButtons   = document.getElementById("editButtons");
+const viewTicketBtn = document.getElementById("viewTicketBtn");
 
 /* ===== MODO EDICIÓN ===== */
 let editMode = false;
-function toggleEditMode(){
+function toggleEditMode() {
   editMode = !editMode;
   if(editButtons) editButtons.style.display = editMode ? "flex" : "none";
-  addItemBtn.style.display = editMode ? "block" : "none"; 
+  addItemBtn.style.display = editMode ? "block" : "none";
   editBtn.textContent = editMode ? "↩️ Volver" : "✏️ Editar";
   render();
 }
@@ -28,20 +29,20 @@ const categories = [
 
 let activeCat = categories[0];
 let items = JSON.parse(localStorage.items || "[]");
-let cart  = JSON.parse(localStorage.cart  || "[]");
+let cart  = JSON.parse(localStorage.cart || "[]");
 
 let deleteIndex = null;
 let deleteType  = null;
 
 /* ===== ORDEN INTELIGENTE ===== */
-function parseQty(name){
+function parseQty(name) {
   const m = name.match(/([\d,.]+)/);
   return m ? parseFloat(m[1].replace(',', '.')) : null;
 }
-function baseName(name){
+function baseName(name) {
   return name.replace(/[\d.,]+\s*(cl|l|litros?|kg|g)?/i, '').trim();
 }
-function sortItems(){
+function sortItems() {
   items.sort((a, b) => {
     if(a.cat !== b.cat) return a.cat.localeCompare(b.cat, 'es', { sensitivity: 'base' });
     const baseA = baseName(a.name), baseB = baseName(b.name);
@@ -55,8 +56,8 @@ function sortItems(){
 }
 
 /* ===== DRAWER ===== */
-function toggleDrawer(){ drawer.classList.toggle("open"); }
-function renderDrawer(){
+function toggleDrawer() { drawer.classList.toggle("open"); }
+function renderDrawer() {
   drawer.innerHTML = '';
   categories.forEach(cat => {
     const btn = document.createElement('button');
@@ -68,7 +69,7 @@ function renderDrawer(){
 }
 
 /* ===== RENDER PRINCIPAL ===== */
-function render(){
+function render() {
   sortItems();
   editBtn.textContent = editMode ? "↩️ Volver" : "✏️ Editar";
   renderDrawer();
@@ -87,13 +88,13 @@ function render(){
       </div>
     `).join("");
 
-  renderTicket(); // ahora el ticket es flotante
+  renderTicket(); // actualizar ticket
   localStorage.items = JSON.stringify(items);
   localStorage.cart  = JSON.stringify(cart);
 }
 
 /* ===== NUEVO ARTÍCULO ===== */
-function showAddItem(){
+function showAddItem() {
   const m = document.createElement("div");
   m.className = "modal"; m.style.display = "flex";
   m.innerHTML = `
@@ -113,7 +114,7 @@ function showAddItem(){
 }
 
 /* ===== MODAL CANTIDAD ===== */
-function showQtyModal(name){
+function showQtyModal(name) {
   let qty = 1, unit = "UNIDAD";
   const m = document.createElement("div");
   m.className = "modal"; m.style.display = "flex";
@@ -128,57 +129,67 @@ function showQtyModal(name){
     </div>`;
   document.body.appendChild(m);
   m.querySelectorAll(".qty button").forEach(b => b.onclick = () => {
-    m.querySelectorAll(".qty button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); qty=+b.textContent;
+    m.querySelectorAll(".qty button").forEach(x=>x.classList.remove("active")); 
+    b.classList.add("active"); qty = +b.textContent;
   });
   m.querySelectorAll(".unit button").forEach(b => b.onclick = () => {
-    m.querySelectorAll(".unit button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); unit=b.textContent;
+    m.querySelectorAll(".unit button").forEach(x=>x.classList.remove("active")); 
+    b.classList.add("active"); unit = b.textContent;
   });
   m.querySelector("#cancel").onclick = () => m.remove();
   m.querySelector("#add").onclick = () => {
     const found = cart.find(c=>c.name===name&&c.unit===unit);
-    if(found) found.qty+=qty; else cart.push({name,qty,unit});
+    if(found) found.qty += qty; else cart.push({name,qty,unit});
     m.remove(); render();
   };
 }
 
-/* ===== TICKET FLOTANTE ===== */
-function renderTicket(){
-  let ticketHTML = cart.map((c,i)=>`
-    <li>${c.name} - ${c.qty} ${c.unit} <button class="del" onclick="askDeleteTicket(${i})">✕</button></li>
-  `).join("");
-
-  ticketList.innerHTML = ticketHTML;
-
-  // Si quieres mostrar el ticket completo en modal flotante
-  const ticketPanel = document.getElementById("ticket-panel");
-  const openTicketBtn = document.getElementById("openTicketBtn");
-  if(openTicketBtn) openTicketBtn.onclick = showTicketModal;
+/* ===== TICKET ===== */
+function renderTicket() {
+  ticketList.innerHTML = cart.map((c, i) =>
+    `<li>${c.name} - ${c.qty} ${c.unit} <button class="del" onclick="askDeleteTicket(${i})">✕</button></li>`
+  ).join("");
 }
 
-function showTicketModal(){
-  const m = document.createElement("div");
-  m.className = "modal"; m.style.display = "flex";
-  m.innerHTML = `
-    <div class="box" style="max-height:80vh; overflow-y:auto">
-      <h3>Ticket</h3>
-      <ul>${cart.map(c=>`<li>${c.name} - ${c.qty} ${c.unit}</li>`).join("")}</ul>
-      <div style="margin-top:16px; display:flex; gap:8px;">
-        <button id="closeTicket">Cerrar</button>
-      </div>
-    </div>`;
-  document.body.appendChild(m);
-  m.querySelector("#closeTicket").onclick = () => m.remove();
+// Abrir/Cerrar modal ticket
+function openTicketModal() {
+  document.getElementById("ticketModal").style.display = "flex";
+  renderTicket();
 }
+function closeTicketModal() {
+  document.getElementById("ticketModal").style.display = "none";
+}
+if(viewTicketBtn) viewTicketBtn.onclick = openTicketModal;
 
 /* ===== ELIMINAR ===== */
-function askDeleteItem(name){ deleteType="item"; deleteIndex=items.findIndex(i=>i.name===name); confirmText.textContent=`¿Eliminar ${name}?`; confirmModal.style.display="flex"; }
-function askDeleteTicket(i){ deleteType="ticket"; deleteIndex=i; confirmText.textContent=`¿Eliminar ${cart[i].name}?`; confirmModal.style.display="flex"; }
-function askResetTicket(){ deleteType="reset"; confirmText.textContent="¿Eliminar ticket de pedido?"; confirmModal.style.display="flex"; }
-function confirmDelete(){ if(deleteType==="item") items.splice(deleteIndex,1); if(deleteType==="ticket") cart.splice(deleteIndex,1); if(deleteType==="reset") cart=[]; closeConfirm(); render(); }
-function closeConfirm(){ confirmModal.style.display="none"; }
+function askDeleteItem(name) {
+  deleteType = "item";
+  deleteIndex = items.findIndex(i => i.name === name);
+  confirmText.textContent = `¿Eliminar ${name}?`;
+  confirmModal.style.display = "flex";
+}
+function askDeleteTicket(i) {
+  deleteType = "ticket";
+  deleteIndex = i;
+  confirmText.textContent = `¿Eliminar ${cart[i].name}?`;
+  confirmModal.style.display = "flex";
+}
+function askResetTicket() {
+  deleteType = "reset";
+  confirmText.textContent = "¿Eliminar ticket de pedido?";
+  confirmModal.style.display = "flex";
+}
+function confirmDelete() {
+  if(deleteType==="item") items.splice(deleteIndex,1);
+  if(deleteType==="ticket") cart.splice(deleteIndex,1);
+  if(deleteType==="reset") cart=[];
+  closeConfirm();
+  render();
+}
+function closeConfirm() { confirmModal.style.display = "none"; }
 
 /* ===== IMPRIMIR ===== */
-function printTicket(){
+function printTicket() {
   let html = `<div id="print-ticket"><h2 style="text-align:center">PEDIDO</h2><p style="text-align:center">${new Date().toLocaleString()}</p><hr>`;
   cart.forEach(c => { html += `<div style="display:flex;justify-content:space-between"><span>${c.name}</span><span>${c.qty} ${c.unit}</span></div>`; });
   html += `<hr><p style="text-align:center">Gracias por su pedido</p></div>`;
@@ -188,15 +199,19 @@ function printTicket(){
 }
 
 /* ===== WHATSAPP ===== */
-function buildWhatsAppText(){
+function buildWhatsAppText() {
   let txt = "🧾 *PEDIDO*\n\n";
   categories.forEach(cat=>{
     const lines = cart.filter(c=>items.find(i=>i.name===c.name&&i.cat===cat));
-    if(lines.length){ txt+=cat.toUpperCase()+"\n"; lines.forEach(l=>txt+=`- ${l.name}: ${l.qty} ${l.unit}\n`); txt+="\n"; }
+    if(lines.length){ 
+      txt += cat.toUpperCase() + "\n"; 
+      lines.forEach(l=> txt+=`- ${l.name}: ${l.qty} ${l.unit}\n`); 
+      txt+="\n"; 
+    }
   });
   return txt.trim();
 }
-function previewWhatsApp(){
+function previewWhatsApp() {
   const m = document.createElement("div"); m.className="modal"; m.style.display="flex";
   m.innerHTML=`<div class="box"><h3>Vista previa WhatsApp</h3><textarea style="width:100%;height:200px">${buildWhatsAppText()}</textarea><div><button id="cancel">Cancelar</button><button id="send">Enviar</button></div></div>`;
   document.body.appendChild(m);
@@ -206,11 +221,34 @@ function previewWhatsApp(){
 function sendWhatsApp(){ previewWhatsApp(); }
 
 /* ===== DATOS INICIALES ===== */
-if(items.length===0) items=[ { name: "Agua 50cl", cat: "Aguas y refrescos" }, { name: "Agua 1,25 litros", cat: "Aguas y refrescos" }, { name: "Coca Cola", cat: "Aguas y refrescos" } ];
+if(items.length===0) items=[ 
+  { name: "Agua 50cl", cat: "Aguas y refrescos" },
+  { name: "Agua 1,25 litros", cat: "Aguas y refrescos" },
+  { name: "Coca Cola", cat: "Aguas y refrescos" }
+];
 
 /* ===== EXPORTAR DATOS ===== */
-function exportData(){ const data={items,cart}; const json=JSON.stringify(data,null,2); const blob=new Blob([json],{type:"application/json"}); const a=document.createElement("a"); a.href=url; a.download="backup_despensa.json"; a.click(); URL.revokeObjectURL(url); }
+function exportData(){
+  const data={items,cart};
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download="backup_despensa.json"; a.click();
+  URL.revokeObjectURL(url);
+}
+
 /* ===== IMPORTAR DATOS ===== */
-function importData(event){ const file=event.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=e=>{ try{ const data=JSON.parse(e.target.result); if(data.items && data.cart){ items=data.items; cart=data.cart; render(); alert("Datos restaurados correctamente ✅"); } else alert("Archivo inválido ⚠️"); } catch{ alert("Error leyendo el archivo ⚠️"); } }; reader.readAsText(file); }
+function importData(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.items && data.cart){ items=data.items; cart=data.cart; render(); alert("Datos restaurados correctamente ✅"); }
+      else alert("Archivo inválido ⚠️");
+    } catch { alert("Error leyendo el archivo ⚠️"); }
+  };
+  reader.readAsText(file);
+}
 
 render();
