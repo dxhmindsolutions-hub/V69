@@ -151,14 +151,22 @@ function renderTicket() {
   ).join("");
 }
 
-// Abrir/Cerrar modal ticket
+// Modal ticket con reset
 function openTicketModal() {
-  document.getElementById("ticketModal").style.display = "flex";
+  const modal = document.getElementById("ticketModal");
+  modal.style.display = "flex";
   renderTicket();
+
+  // Añadir evento del botón reset dentro del modal
+  const resetBtn = document.getElementById("resetTicketBtn");
+  if(resetBtn) resetBtn.onclick = () => {
+    cart = [];
+    render();
+    renderTicket();
+    modal.style.display = "none";
+  };
 }
-function closeTicketModal() {
-  document.getElementById("ticketModal").style.display = "none";
-}
+function closeTicketModal() { document.getElementById("ticketModal").style.display = "none"; }
 if(viewTicketBtn) viewTicketBtn.onclick = openTicketModal;
 
 /* ===== ELIMINAR ===== */
@@ -191,7 +199,9 @@ function closeConfirm() { confirmModal.style.display = "none"; }
 /* ===== IMPRIMIR ===== */
 function printTicket() {
   let html = `<div id="print-ticket"><h2 style="text-align:center">PEDIDO</h2><p style="text-align:center">${new Date().toLocaleString()}</p><hr>`;
-  cart.forEach(c => { html += `<div style="display:flex;justify-content:space-between"><span>${c.name}</span><span>${c.qty} ${c.unit}</span></div>`; });
+  cart.forEach(c => { 
+    html += `<div style="display:flex;justify-content:space-between"><span>${c.name}</span><span>${c.qty} ${c.unit}</span></div>`; 
+  });
   html += `<hr><p style="text-align:center">Gracias por su pedido</p></div>`;
   document.body.insertAdjacentHTML("beforeend", html);
   window.print();
@@ -227,7 +237,7 @@ if(items.length===0) items=[
   { name: "Coca Cola", cat: "Aguas y refrescos" }
 ];
 
-/* ===== EXPORTAR DATOS ===== */
+/* ===== EXPORTAR / IMPORTAR DATOS ===== */
 function exportData(){
   const data={items,cart};
   const json=JSON.stringify(data,null,2);
@@ -236,8 +246,6 @@ function exportData(){
   const a=document.createElement("a"); a.href=url; a.download="backup_despensa.json"; a.click();
   URL.revokeObjectURL(url);
 }
-
-/* ===== IMPORTAR DATOS ===== */
 function importData(event){
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
