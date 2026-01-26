@@ -9,6 +9,79 @@
 <meta name="theme-color" content="#4CAF50">
 
 <style>
+  /* ===== TODO TU CSS ACTUAL ===== */
+
+  /* ===== TICKET REDISEÑADO ===== */
+  .ticketBox{
+    max-width:420px;
+  }
+
+  .ticketHeader{
+    text-align:center;
+    margin-bottom:12px;
+  }
+
+  .ticketHeader h3{
+    margin:0;
+    font-size:18px;
+  }
+
+  .ticketHeader small{
+    display:block;
+    color:#666;
+    margin:4px 0;
+  }
+
+  #ticketSummary{
+    font-weight:600;
+    margin-top:6px;
+  }
+
+  .ticketList{
+    list-style:none;
+    padding:0;
+    margin:12px 0;
+  }
+
+  .ticketList li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
+    border-bottom:1px solid #eee;
+    font-size:15px;
+  }
+
+  .ticketList li span.qty{
+    font-weight:700;
+  }
+
+  .ticketList .del{
+    background:#ff3b30;
+    color:#fff;
+    border-radius:8px;
+    padding:4px 8px;
+    font-size:14px;
+  }
+
+  .ticketActions{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:12px;
+  }
+
+  .ticketActions button{
+    padding:12px;
+    border-radius:12px;
+    font-weight:600;
+  }
+
+  .ticketActions .danger{
+    background:#000;
+    color:#fff;
+  }
+
   @font-face { font-family: 'Inter'; src: url('fonts/Inter-Regular.woff2') format('woff2'); font-weight: 400;}
   @font-face { font-family: 'Inter'; src: url('fonts/Inter-Medium.woff2') format('woff2'); font-weight: 500;}
   @font-face { font-family: 'Inter'; src: url('fonts/Inter-SemiBold.woff2') format('woff2'); font-weight: 600;}
@@ -146,15 +219,20 @@
     justify-content:center;
     z-index:50;
   }
-  .modal .box{
-    background:#fff;
-    border-radius:16px;
-    padding:20px;
-    width:90%;
-    max-width:400px;
-    max-height:80vh;
-    overflow-y:auto;
-  }
+ .modal .box{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  width:90%;
+  max-width:400px;
+  max-height:80vh;
+  overflow:hidden;
+}
+  .ticketList{
+  max-height:40vh;
+  overflow-y:auto;
+}
+
   .modal input, .modal select, .modal textarea{
     width:100%;
     padding:12px;
@@ -231,18 +309,24 @@
 
 <!-- MODAL TICKET -->
 <div id="ticketModal" class="modal">
-  <div class="box">
-    <strong>🧾 Ticket</strong>
-    <div id="ticketSummary" style="margin-bottom:12px; font-weight:600;"></div>
-    <ul id="ticketList"></ul>
-    <div class="ticket-actions" style="margin-top:12px; display:flex; gap:8px;">
+  <div class="box ticketBox">
+    <div class="ticketHeader">
+      <h3>🧾 Pedido</h3>
+      <small id="ticketDate"></small>
+      <div id="ticketSummary"></div>
+    </div>
+
+    <ul id="ticketList" class="ticketList"></ul>
+
+    <div class="ticketActions">
       <button onclick="printTicket()">🖨️ Imprimir</button>
       <button onclick="sendWhatsApp()">📲 WhatsApp</button>
-      <button onclick="resetTicket()">🆕 Nuevo Ticket</button>
+      <button class="danger" onclick="askResetTicket()">🔄 Nuevo pedido</button>
       <button onclick="closeTicketModal()">❌ Cerrar</button>
     </div>
   </div>
 </div>
+
 
 <!-- MODAL CONFIRMACIÓN -->
 <div id="confirmModal" class="modal">
@@ -275,6 +359,8 @@
   function closeTicketModal(){
     document.getElementById("ticketModal").style.display = "none";
   }
+
+  
 </script>
 </body>
 </html>
