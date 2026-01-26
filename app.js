@@ -145,7 +145,9 @@ function showQtyModal(name){
 /* ===== TICKET ===== */
 function renderTicket(){
   ticketList.innerHTML = cart.map((c,i)=>`
-    <li>${c.name} - ${c.qty} ${c.unit}
+    <li>
+      <span>${c.name}</span>
+      <span>${c.qty} ${c.unit}</span>
       <button class="del" onclick="askDeleteTicket(${i})">✕</button>
     </li>
   `).join("");
