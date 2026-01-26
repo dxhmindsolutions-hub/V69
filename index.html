@@ -198,6 +198,64 @@
 
   /* ===== NORMALIZAR BOTONES (Safari iOS) ===== */
   button{ appearance:none; -webkit-appearance:none;}
+
+  /* ===== TICKET MEJORADO (SIN ROMPER APP) ===== */
+
+/* Lista con scroll */
+#ticketList{
+  list-style:none;
+  padding:0;
+  margin:8px 0;
+  max-height:40vh;
+  overflow-y:auto;
+}
+
+/* Fila tipo tabla */
+#ticketList li{
+  display:grid;
+  grid-template-columns:1fr auto 28px;
+  align-items:center;
+  gap:8px;
+  padding:8px 6px;
+  border-bottom:1px solid #eee;
+  font-size:14px;
+}
+
+/* Texto artículo */
+#ticketList li span{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+/* Unidades */
+#ticketList li strong{
+  font-weight:600;
+  font-size:14px;
+}
+
+/* Botón eliminar pequeño y alineado */
+#ticketList .del{
+  width:24px;
+  height:24px;
+  font-size:14px;
+  padding:0;
+  border-radius:6px;
+}
+
+/* Botones del ticket en horizontal */
+.ticket-actions{
+  display:grid !important;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.ticket-actions button{
+  padding:10px;
+  font-size:14px;
+  font-weight:600;
+}
+
 </style>
 </head>
 <body>
