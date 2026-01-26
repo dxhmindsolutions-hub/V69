@@ -5,7 +5,6 @@ const list          = document.getElementById("list");
 const ticketList    = document.getElementById("ticketList");
 const confirmModal  = document.getElementById("confirmModal");
 const confirmText   = document.getElementById("confirmText");
-const addItemBtn    = document.getElementById("addItemBtn");
 const editBtn       = document.getElementById("editBtn");
 const editButtons   = document.getElementById("editButtons");
 const viewTicketBtn = document.getElementById("viewTicketBtn");
@@ -15,7 +14,6 @@ let editMode = false;
 function toggleEditMode(){
   editMode = !editMode;
   if(editButtons) editButtons.style.display = editMode ? "flex" : "none";
-  addItemBtn.style.display = editMode ? "block" : "none"; 
   editBtn.textContent = editMode ? "↩️ Volver" : "✏️ Editar";
   render();
 }
@@ -34,27 +32,6 @@ let cart  = JSON.parse(localStorage.cart  || "[]");
 let deleteIndex = null;
 let deleteType  = null;
 
-/* ===== ORDEN INTELIGENTE ===== */
-function parseQty(name){
-  const m = name.match(/([\d,.]+)/);
-  return m ? parseFloat(m[1].replace(',', '.')) : null;
-}
-function baseName(name){
-  return name.replace(/[\d.,]+\s*(cl|l|litros?|kg|g)?/i, '').trim();
-}
-function sortItems(){
-  items.sort((a, b) => {
-    if(a.cat !== b.cat) return a.cat.localeCompare(b.cat, 'es', { sensitivity: 'base' });
-    const baseA = baseName(a.name), baseB = baseName(b.name);
-    if(baseA !== baseB) return baseA.localeCompare(baseB, 'es', { sensitivity: 'base' });
-    const qA = parseQty(a.name), qB = parseQty(b.name);
-    if(qA !== null && qB !== null) return qA - qB;
-    if(qA !== null) return -1;
-    if(qB !== null) return 1;
-    return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
-  });
-}
-
 /* ===== DRAWER ===== */
 function toggleDrawer(){ drawer.classList.toggle("open"); }
 function renderDrawer(){
@@ -70,8 +47,6 @@ function renderDrawer(){
 
 /* ===== RENDER PRINCIPAL ===== */
 function render(){
-  sortItems();
-  editBtn.textContent = editMode ? "↩️ Volver" : "✏️ Editar";
   renderDrawer();
   const q = search.value.toLowerCase();
 
@@ -79,7 +54,7 @@ function render(){
     .filter(i => q ? i.name.toLowerCase().includes(q) : i.cat === activeCat)
     .map(i => `
       <div class="item">
-        <span>${i.name}${q ? `<small style="color:#666">(${i.cat})</small>` : ""}</span>
+        <span>${i.name}${q ? `<small>(${i.cat})</small>` : ""}</span>
         <div>
           ${editMode
             ? `<button class="del" onclick="askDeleteItem('${i.name}')">✕</button>`
@@ -89,8 +64,17 @@ function render(){
     `).join("");
 
   renderTicket();
+  updateTicketCounter();
+
   localStorage.items = JSON.stringify(items);
   localStorage.cart  = JSON.stringify(cart);
+}
+
+/* ===== CONTADOR VER TICKET ===== */
+function updateTicketCounter(){
+  const total = cart.length;
+  viewTicketBtn.textContent = `🧾 Ver Ticket [ ${String(total).padStart(2,"0")} ]`;
+  viewTicketBtn.style.display = total ? "block" : "none";
 }
 
 /* ===== NUEVO ARTÍCULO ===== */
@@ -102,14 +86,17 @@ function showAddItem(){
       <h3>Nuevo artículo</h3>
       <input id="iname" placeholder="Nombre">
       <select id="icat">${categories.map(c => `<option>${c}</option>`).join("")}</select>
-      <div><button id="save">Guardar</button><button id="cancel">Cancelar</button></div>
+      <div>
+        <button id="save">Guardar</button>
+        <button id="cancel">Cancelar</button>
+      </div>
     </div>`;
   document.body.appendChild(m);
   m.querySelector("#cancel").onclick = () => m.remove();
   m.querySelector("#save").onclick = () => {
     const n = m.querySelector("#iname").value.trim();
     const c = m.querySelector("#icat").value;
-    if(n){ items.push({ name: n, cat: c }); m.remove(); render(); }
+    if(n){ items.push({ name:n, cat:c }); m.remove(); render(); }
   };
 }
 
@@ -122,96 +109,101 @@ function showQtyModal(name){
     <div class="box">
       <h3>${name}</h3>
       <p>Cantidad</p>
-      <div class="btns qty">${[1,2,3,4,5,6,7,8,9,10].map(n => `<button>${n}</button>`).join("")}</div>
+      <div class="btns qty">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button>${n}</button>`).join("")}</div>
       <p>Unidad</p>
-      <div class="btns unit"><button class="active">UNIDAD</button><button>KG</button><button>CAJA</button></div>
-      <div><button id="add">Añadir</button><button id="cancel">Cancelar</button></div>
+      <div class="btns unit">
+        <button class="active">UNIDAD</button>
+        <button>KG</button>
+        <button>CAJA</button>
+      </div>
+      <div>
+        <button id="add">Añadir</button>
+        <button id="cancel">Cancelar</button>
+      </div>
     </div>`;
   document.body.appendChild(m);
+
   m.querySelectorAll(".qty button").forEach(b => b.onclick = () => {
-    m.querySelectorAll(".qty button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); qty=+b.textContent;
+    m.querySelectorAll(".qty button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); qty=+b.textContent;
   });
+
   m.querySelectorAll(".unit button").forEach(b => b.onclick = () => {
-    m.querySelectorAll(".unit button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); unit=b.textContent;
+    m.querySelectorAll(".unit button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); unit=b.textContent;
   });
+
   m.querySelector("#cancel").onclick = () => m.remove();
   m.querySelector("#add").onclick = () => {
-    const found = cart.find(c=>c.name===name&&c.unit===unit);
-    if(found) found.qty+=qty; else cart.push({name,qty,unit});
+    const found = cart.find(c=>c.name===name && c.unit===unit);
+    if(found) found.qty += qty;
+    else cart.push({ name, qty, unit });
     m.remove(); render();
   };
 }
 
 /* ===== TICKET ===== */
 function renderTicket(){
-  // Actualizar lista en modal
   ticketList.innerHTML = cart.map((c,i)=>`
-    <li>${c.name} - ${c.qty} ${c.unit} <button class="del" onclick="askDeleteTicket(${i})">✕</button></li>
+    <li>${c.name} - ${c.qty} ${c.unit}
+      <button class="del" onclick="askDeleteTicket(${i})">✕</button>
+    </li>
   `).join("");
-
-  // Actualizar contador en el botón Ver Ticket
-  const totalItems = cart.reduce((sum,c)=>sum+c.qty,0);
-  if(viewTicketBtn) viewTicketBtn.textContent = `🧾 Ver Ticket [ ${totalItems.toString().padStart(2,'0')} ]`;
 }
 
 /* ===== MODAL TICKET ===== */
 function openTicketModal(){
   document.getElementById("ticketModal").style.display = "flex";
-  renderTicket();
 }
 function closeTicketModal(){
   document.getElementById("ticketModal").style.display = "none";
 }
-function resetTicket(){
-  if(cart.length === 0) return;
-  if(confirm("¿Vaciar el ticket?")){
-    cart = [];
-    render();
-    renderTicket();
-    closeTicketModal();
-  }
-}
 
 /* ===== ELIMINAR ===== */
-function askDeleteItem(name){ deleteType="item"; deleteIndex=items.findIndex(i=>i.name===name); confirmText.textContent=`¿Eliminar ${name}?`; confirmModal.style.display="flex"; }
-function askDeleteTicket(i){ deleteType="ticket"; deleteIndex=i; confirmText.textContent=`¿Eliminar ${cart[i].name}?`; confirmModal.style.display="flex"; }
-function askResetTicket(){ deleteType="reset"; confirmText.textContent="¿Eliminar ticket de pedido?"; confirmModal.style.display="flex"; }
-function confirmDelete(){ if(deleteType==="item") items.splice(deleteIndex,1); if(deleteType==="ticket") cart.splice(deleteIndex,1); if(deleteType==="reset") cart=[]; closeConfirm(); render(); }
+function askDeleteItem(name){
+  deleteType="item";
+  deleteIndex=items.findIndex(i=>i.name===name);
+  confirmText.textContent=`¿Eliminar ${name}?`;
+  confirmModal.style.display="flex";
+}
+function askDeleteTicket(i){
+  deleteType="ticket";
+  deleteIndex=i;
+  confirmText.textContent=`¿Eliminar ${cart[i].name}?`;
+  confirmModal.style.display="flex";
+}
+function confirmDelete(){
+  if(deleteType==="item") items.splice(deleteIndex,1);
+  if(deleteType==="ticket") cart.splice(deleteIndex,1);
+  closeConfirm(); render();
+}
 function closeConfirm(){ confirmModal.style.display="none"; }
 
 /* ===== IMPRIMIR ===== */
 function printTicket(){
-  let html = `<div id="print-ticket"><h2 style="text-align:center">PEDIDO</h2><p style="text-align:center">${new Date().toLocaleString()}</p><hr>`;
-  cart.forEach(c => { html += `<div style="display:flex;justify-content:space-between"><span>${c.name}</span><span>${c.qty} ${c.unit}</span></div>`; });
-  html += `<hr><p style="text-align:center">Gracias por su pedido</p></div>`;
-  document.body.insertAdjacentHTML("beforeend", html);
+  let html = `<div id="print-ticket"><h2>PEDIDO</h2><hr>`;
+  cart.forEach(c=>{
+    html+=`<div>${c.name} — ${c.qty} ${c.unit}</div>`;
+  });
+  html+=`<hr></div>`;
+  document.body.insertAdjacentHTML("beforeend",html);
   window.print();
   document.getElementById("print-ticket").remove();
 }
 
 /* ===== WHATSAPP ===== */
-function buildWhatsAppText(){
-  let txt = "🧾 *PEDIDO*\n\n";
-  categories.forEach(cat=>{
-    const lines = cart.filter(c=>items.find(i=>i.name===c.name&&i.cat===cat));
-    if(lines.length){ txt+=cat.toUpperCase()+"\n"; lines.forEach(l=>txt+=`- ${l.name}: ${l.qty} ${l.unit}\n`); txt+="\n"; }
-  });
-  return txt.trim();
+function sendWhatsApp(){
+  let txt="🧾 *PEDIDO*\n\n";
+  cart.forEach(c=>txt+=`- ${c.name}: ${c.qty} ${c.unit}\n`);
+  window.open("https://wa.me/?text="+encodeURIComponent(txt));
 }
-function previewWhatsApp(){
-  const m = document.createElement("div"); m.className="modal"; m.style.display="flex";
-  m.innerHTML=`<div class="box"><h3>Vista previa WhatsApp</h3><textarea style="width:100%;height:200px">${buildWhatsAppText()}</textarea><div><button id="cancel">Cancelar</button><button id="send">Enviar</button></div></div>`;
-  document.body.appendChild(m);
-  m.querySelector("#cancel").onclick=()=>m.remove();
-  m.querySelector("#send").onclick=()=>{ window.open("https://wa.me/?text="+encodeURIComponent(m.querySelector("textarea").value)); m.remove(); };
-}
-function sendWhatsApp(){ previewWhatsApp(); }
 
 /* ===== DATOS INICIALES ===== */
-if(items.length===0) items=[ { name: "Agua 50cl", cat: "Aguas y refrescos" }, { name: "Agua 1,25 litros", cat: "Aguas y refrescos" }, { name: "Coca Cola", cat: "Aguas y refrescos" } ];
-
-/* ===== EXPORTAR / IMPORTAR ===== */
-function exportData(){ const data={items,cart}; const json=JSON.stringify(data,null,2); const blob=new Blob([json],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="backup_despensa.json"; a.click(); URL.revokeObjectURL(a.href); }
-function importData(event){ const file=event.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=e=>{ try{ const data=JSON.parse(e.target.result); if(data.items && data.cart){ items=data.items; cart=data.cart; render(); alert("Datos restaurados correctamente ✅"); } else alert("Archivo inválido ⚠️"); } catch{ alert("Error leyendo el archivo ⚠️"); } }; reader.readAsText(file); }
+if(items.length===0){
+  items=[
+    {name:"Agua 50cl",cat:"Aguas y refrescos"},
+    {name:"Coca Cola",cat:"Aguas y refrescos"}
+  ];
+}
 
 render();
