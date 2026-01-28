@@ -211,8 +211,6 @@ function sendWhatsApp(){
   });
 }
 
-}
-
 /* ===== DATOS INICIALES ===== */
 if(items.length===0){
   items=[
