@@ -200,14 +200,17 @@ function sendWhatsApp(){
     txt += `• ${c.name}: ${c.qty} ${c.unit}\n`;
   });
 
-  if (navigator.share) {
-    navigator.share({
-      title: "Pedido",
-      text: txt
-    });
-  } else {
-    window.open("https://wa.me/?text=" + encodeURIComponent(txt));
+  if (!navigator.share) {
+    alert("La vista previa solo está disponible en móvil 📱");
+    return;
   }
+
+  navigator.share({
+    title: "Pedido",
+    text: txt
+  });
+}
+
 }
 
 /* ===== DATOS INICIALES ===== */
