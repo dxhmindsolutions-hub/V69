@@ -207,5 +207,19 @@ if(items.length===0){
     {name:"Coca Cola",cat:"Aguas y refrescos"}
   ];
 }
+/* ===== NUEVO TICKET ===== */
+function resetTicket(){
+  if(!cart.length) return;
+
+  if(!confirm("¿Empezar un nuevo ticket?")){
+    return;
+  }
+
+  cart = [];
+  localStorage.cart = JSON.stringify(cart);
+  closeTicketModal();
+  render();
+}
+
 
 render();
