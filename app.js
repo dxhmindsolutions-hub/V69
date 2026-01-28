@@ -212,11 +212,12 @@ function sendWhatsApp(){
 }
 
 /* ===== DATOS INICIALES ===== */
-if(items.length===0){
-  items=[
+if(!localStorage.items){
+  items = [
     {name:"Agua 50cl",cat:"Aguas y refrescos"},
     {name:"Coca Cola",cat:"Aguas y refrescos"}
   ];
+  localStorage.items = JSON.stringify(items);
 }
 /* ===== NUEVO TICKET ===== */
 function resetTicket(){
