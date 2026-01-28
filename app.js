@@ -195,9 +195,19 @@ function printTicket(){
 
 /* ===== WHATSAPP ===== */
 function sendWhatsApp(){
-  let txt="🧾 *PEDIDO*\n\n";
-  cart.forEach(c=>txt+=`- ${c.name}: ${c.qty} ${c.unit}\n`);
-  window.open("https://wa.me/?text="+encodeURIComponent(txt));
+  let txt = "🧾 PEDIDO\n\n";
+  cart.forEach(c=>{
+    txt += `• ${c.name}: ${c.qty} ${c.unit}\n`;
+  });
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Pedido",
+      text: txt
+    });
+  } else {
+    window.open("https://wa.me/?text=" + encodeURIComponent(txt));
+  }
 }
 
 /* ===== DATOS INICIALES ===== */
@@ -219,6 +229,49 @@ function resetTicket(){
   localStorage.cart = JSON.stringify(cart);
   closeTicketModal();
   render();
+}
+
+function exportData(){
+  const data = {
+    items,
+    cart
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "despensa_backup.json";
+  a.click();
+
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      if (Array.isArray(data.items)) items = data.items;
+      if (Array.isArray(data.cart))  cart  = data.cart;
+
+      localStorage.items = JSON.stringify(items);
+      localStorage.cart  = JSON.stringify(cart);
+
+      render();
+      alert("Datos importados correctamente ✅");
+    } catch {
+      alert("Archivo no válido ❌");
+    }
+  };
+  reader.readAsText(file);
 }
 
 
